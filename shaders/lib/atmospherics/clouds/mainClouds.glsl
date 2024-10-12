@@ -40,6 +40,9 @@ float InterleavedGradientNoiseForClouds() {
 #ifdef CLOUDS_UNBOUND
     #include "/lib/atmospherics/clouds/unboundClouds.glsl"
 #endif
+#ifdef CLOUDS_RETRO
+    #include "/lib/atmospherics/clouds/retroClouds.glsl"
+#endif 
 
 vec4 GetClouds(inout float cloudLinearDepth, float skyFade, vec3 cameraPos, vec3 playerPos,
                float lViewPos, float VdotS, float VdotU, float dither, vec3 auroraBorealis, vec3 nightNebula) {
@@ -55,7 +58,7 @@ vec4 GetClouds(inout float cloudLinearDepth, float skyFade, vec3 cameraPos, vec3
         thresholdF = max(thresholdF, renderDistance);
     #endif
 
-    #ifdef CLOUDS_REIMAGINED
+    #if defined CLOUDS_REIMAGINED || defined CLOUDS_RETRO
         cloudAmbientColor *= 1.0 - 0.25 * rainFactor;
     #endif
 

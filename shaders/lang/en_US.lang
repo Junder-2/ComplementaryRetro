@@ -327,6 +327,7 @@ value.CLOUD_STYLE_DEFINE.-1=Default Style
 value.CLOUD_STYLE_DEFINE.0=§cOFF
 value.CLOUD_STYLE_DEFINE.1=Reimagined
 value.CLOUD_STYLE_DEFINE.3=Unbound
+value.CLOUD_STYLE_DEFINE.5=Retro
 value.CLOUD_STYLE_DEFINE.50=Vanilla §e[*]
 
 option.CLOUD_SHADOWS=Cloud Shadows

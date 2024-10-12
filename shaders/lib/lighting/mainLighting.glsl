@@ -6,7 +6,7 @@
     #include "/lib/lighting/shadowSampling.glsl"
 #endif
 
-#if defined CLOUDS_REIMAGINED && defined CLOUD_SHADOWS
+#if (defined CLOUDS_REIMAGINED || defined CLOUDS_RETRO) && defined CLOUD_SHADOWS
     #include "/lib/atmospherics/clouds/cloudCoord.glsl"
 #endif
 
@@ -257,7 +257,7 @@ void DoLighting(inout vec4 color, inout vec3 shadowMult, vec3 playerPos, vec3 vi
             #ifdef CLOUD_SHADOWS
                 vec3 worldPos = playerPos + cameraPosition;
 
-                #ifdef CLOUDS_REIMAGINED
+                #if defined CLOUDS_REIMAGINED
                     float EdotL = dot(eastVec, lightVec);
                     float EdotLM = tan(acos(EdotL));
 
@@ -286,6 +286,26 @@ void DoLighting(inout vec4 color, inout vec3 shadowMult, vec3 playerPos, vec3 vi
 
                         cloudSample = max(cloudSample, cloudSample2);
                     #endif
+
+                    cloudSample *= sqrt3(1.0 - abs(EdotL));
+                    shadowMult *= 1.0 - 0.85 * cloudSample;
+                #elif defined CLOUDS_RETRO
+                    float EdotL = dot(eastVec, lightVec);
+                    float EdotLM = tan(acos(EdotL));
+
+                    #if SUN_ANGLE != 0
+                        float NVdotLM = tan(acos(dot(northVec, lightVec)));
+                    #endif
+
+                    float distToCloudLayer1 = cloudAlt1i - worldPos.y;
+                    vec3 cloudOffset1 = vec3(distToCloudLayer1 / EdotLM, 0.0, 0.0);
+                    #if SUN_ANGLE != 0
+                        cloudOffset1.z += distToCloudLayer1 / NVdotLM;
+                    #endif
+                    float distSmoothing = clamp(distToCloudLayer1/1000.0, 0.0, 0.05);
+                    vec2 cloudPos1 = GetRoundedCloudCoord(ModifyTracePos(worldPos + cloudOffset1, cloudAlt1i).xz, distSmoothing);
+                    float cloudSample = texture2D(gaux4, cloudPos1).b;
+                    cloudSample *= clamp(distToCloudLayer1 * 0.1, 0.0, 1.0);
 
                     cloudSample *= sqrt3(1.0 - abs(EdotL));
                     shadowMult *= 1.0 - 0.85 * cloudSample;
